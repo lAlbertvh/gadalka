@@ -1,0 +1,24 @@
+# Build artifacts
+build/
+build-asan/
+
+# Runtime data (secrets, sessions, logs)
+*.db
+*.db-wal
+*.db-shm
+news_cache.json
+server.log
+server.pid
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/cert/
+
+# Frontend is a separate project (symlinked locally, published separately).
+/frontend
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store

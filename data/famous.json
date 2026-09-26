@@ -1,0 +1,156 @@
+[
+  {"name":"Альберт Эйнштейн","lang":"ru","birth":"1879-03-14","time":"11:30","place":"Ульм","events":[
+    {"year":1905,"category":"creative","outcome":"success","ru":"годы «чудесных статей» по физике","en":"year of the groundbreaking physics papers"},
+    {"year":1921,"category":"career","outcome":"success","ru":"получил Нобелевскую премию","en":"won the Nobel Prize"},
+    {"year":1933,"category":"move","outcome":"mixed","ru":"переехал в США, покинув Германию","en":"moved to the USA, leaving Germany"}]},
+  {"name":"Илон Маск","lang":"ru","birth":"1971-06-28","time":"07:30","place":"Претория","events":[
+    {"year":2008,"category":"business","outcome":"mixed","ru":"кризис Tesla, чуть не потерял компанию","en":"Tesla near collapse, almost lost the company"},
+    {"year":2010,"category":"business","outcome":"success","ru":"IPO Tesla на бирже","en":"Tesla IPO on the stock exchange"},
+    {"year":2022,"category":"business","outcome":"mixed","ru":"покупка Twitter, бурные перемены","en":"acquired Twitter, turbulent changes"}]},
+  {"name":"Стив Джобс","lang":"ru","birth":"1955-02-24","time":"19:15","place":"Сан-Франциско","events":[
+    {"year":1985,"category":"career","outcome":"fail","ru":"уволен из собственной Apple","en":"fired from his own company Apple"},
+    {"year":1991,"category":"family","outcome":"success","ru":"создал семью с Лорин Пауэлл","en":"built a family with Laurene Powell"},
+    {"year":2007,"category":"business","outcome":"success","ru":"запуск iPhone","en":"launched the iPhone"}]},
+  {"name":"Билл Гейтс","lang":"ru","birth":"1955-10-28","time":"22:00","place":"Сиэтл","events":[
+    {"year":1975,"category":"business","outcome":"success","ru":"основал Microsoft","en":"founded Microsoft"},
+    {"year":1985,"category":"business","outcome":"success","ru":"запуск Windows","en":"released Windows"}]},
+  {"name":"Марк Цукерберг","lang":"ru","birth":"1984-05-14","time":"14:00","place":"Уайт-Плейнс","events":[
+    {"year":2004,"category":"business","outcome":"success","ru":"запуск Facebook","en":"launched Facebook"},
+    {"year":2012,"category":"business","outcome":"success","ru":"IPO Facebook","en":"Facebook IPO"}]},
+  {"name":"Джефф Безос","lang":"ru","birth":"1964-01-12","time":"07:04","place":"Альбукерке","events":[
+    {"year":1994,"category":"business","outcome":"success","ru":"основал Amazon","en":"founded Amazon"},
+    {"year":2013,"category":"business","outcome":"success","ru":"купил The Washington Post","en":"acquired The Washington Post"}]},
+  {"name":"Уоррен Баффетт","lang":"ru","birth":"1930-08-30","time":"09:02","place":"Омаха","events":[
+    {"year":1965,"category":"business","outcome":"success","ru":"получил контроль над Berkshire","en":"took control of Berkshire"},
+    {"year":2008,"category":"money","outcome":"mixed","ru":"инвестиции пострадали в кризис","en":"investments hit by the crisis"}]},
+  {"name":"Наполеон Бонапарт","lang":"ru","birth":"1769-08-15","time":"11:29","place":"Аяччо","events":[
+    {"year":1796,"category":"relationship","outcome":"success","ru":"женился на Жозефине","en":"married Josephine"},
+    {"year":1804,"category":"politics","outcome":"success","ru":"провозглашён императором","en":"proclaimed Emperor"},
+    {"year":1805,"category":"politics","outcome":"success","ru":"победа при Аустерлице","en":"victory at Austerlitz"},
+    {"year":1815,"category":"politics","outcome":"fail","ru":"поражение при Ватерлоо","en":"defeat at Waterloo"}]},
+  {"name":"Уинстон Черчилль","lang":"ru","birth":"1874-11-30","time":"01:30","place":"Бленхейм","events":[
+    {"year":1940,"category":"politics","outcome":"success","ru":"стал премьер-министром в дни войны","en":"became Prime Minister during the war"},
+    {"year":1945,"category":"politics","outcome":"fail","ru":"проиграл выборы","en":"lost the election"}]},
+  {"name":"Зигмунд Фрейд","lang":"ru","birth":"1856-05-06","time":"18:30","place":"Пршибор","events":[
+    {"year":1899,"category":"study","outcome":"success","ru":"издал «Толкование сновидений»","en":"published The Interpretation of Dreams"},
+    {"year":1923,"category":"health","outcome":"fail","ru":"диагностирован рак","en":"diagnosed with cancer"}]},
+  {"name":"Мэрилин Монро","lang":"ru","birth":"1926-06-01","time":"09:30","place":"Лос-Анджелес","events":[
+    {"year":1953,"category":"creative","outcome":"success","ru":"звезда мирового кино","en":"became a world movie star"},
+    {"year":1954,"category":"relationship","outcome":"fail","ru":"развод с Джо Ди Маджо","en":"divorce from Joe DiMaggio"},
+    {"year":1962,"category":"health","outcome":"fail","ru":"трагически ушла из жизни","en":"tragically passed away"}]},
+  {"name":"Джон Кеннеди","lang":"ru","birth":"1917-05-29","time":"15:00","place":"Бруклин","events":[
+    {"year":1960,"category":"politics","outcome":"success","ru":"избран президентом США","en":"elected US President"},
+    {"year":1963,"category":"health","outcome":"fail","ru":"убит в Далласе","en":"assassinated in Dallas"}]},
+  {"name":"Мартин Лютер Кинг","lang":"ru","birth":"1929-01-15","time":"12:00","place":"Атланта","events":[
+    {"year":1964,"category":"politics","outcome":"success","ru":"получил Нобелевскую премию мира","en":"received the Nobel Peace Prize"},
+    {"year":1968,"category":"health","outcome":"fail","ru":"убит в Мемфисе","en":"assassinated in Memphis"}]},
+  {"name":"Майкл Джексон","lang":"ru","birth":"1958-08-29","time":"22:10","place":"Гэри","events":[
+    {"year":1982,"category":"creative","outcome":"success","ru":"альбом Thriller","en":"the Thriller album"},
+    {"year":2005,"category":"money","outcome":"mixed","ru":"суд, оправдание по делу","en":"trial and acquittal"}]},
+  {"name":"Принс","lang":"ru","birth":"1958-06-07","time":"18:17","place":"Миннеаполис","events":[
+    {"year":1984,"category":"creative","outcome":"success","ru":"фильм и альбом Purple Rain","en":"Purple Rain film and album"},
+    {"year":1987,"category":"creative","outcome":"mixed","ru":"смешанный приём альбома","en":"mixed reception of the album"}]},
+  {"name":"Джими Хендрикс","lang":"ru","birth":"1942-11-27","time":"10:15","place":"Сиэтл","events":[
+    {"year":1967,"category":"creative","outcome":"success","ru":"прорыв с Are You Experienced","en":"breakthrough with Are You Experienced"},
+    {"year":1970,"category":"health","outcome":"fail","ru":"умер в Лондоне","en":"died in London"}]},
+  {"name":"Королева Елизавета II","lang":"ru","birth":"1926-04-21","time":"02:40","place":"Лондон","events":[
+    {"year":1952,"category":"politics","outcome":"success","ru":"взошла на престол","en":"ascended the throne"}]},
+  {"name":"Опра Уинфри","lang":"ru","birth":"1954-01-29","time":"04:00","place":"Кошиуско","events":[
+    {"year":1986,"category":"business","outcome":"success","ru":"запуск ток-шоу в синдикации","en":"launched her syndicated talk show"},
+    {"year":2011,"category":"money","outcome":"success","ru":"запуск телесети OWN","en":"launched the OWN network"}]},
+  {"name":"Барак Обама","lang":"ru","birth":"1961-08-04","time":"19:24","place":"Гонолулу","events":[
+    {"year":1998,"category":"family","outcome":"success","ru":"родилась дочь Малия","en":"daughter Malia was born"},
+    {"year":2008,"category":"politics","outcome":"success","ru":"избран президентом США","en":"elected US President"}]},
+  {"name":"Махатма Ганди","lang":"ru","birth":"1869-10-02","time":"07:25","place":"Порбандар","events":[
+    {"year":1893,"category":"move","outcome":"mixed","ru":"переехал в Южную Африку","en":"moved to South Africa"},
+    {"year":1930,"category":"politics","outcome":"success","ru":"Соляной марш","en":"the Salt March"},
+    {"year":1948,"category":"health","outcome":"fail","ru":"убит в Дели","en":"assassinated in Delhi"}]},
+  {"name":"Джавахарлал Неру","lang":"ru","birth":"1889-11-14","time":"23:30","place":"Аллахабад","events":[
+    {"year":1947,"category":"politics","outcome":"success","ru":"первый премьер-министр Индии","en":"first Prime Minister of India"},
+    {"year":1958,"category":"politics","outcome":"mixed","ru":"правительственный кризис в партии","en":"party government crisis"}]},
+  {"name":"Нарендра Моди","lang":"ru","birth":"1950-09-17","time":"13:00","place":"Ваднагар","events":[
+    {"year":2001,"category":"politics","outcome":"success","ru":"стал главным министром Гуджарата","en":"became Chief Minister of Gujarat"},
+    {"year":2014,"category":"politics","outcome":"success","ru":"избран премьер-министром Индии","en":"elected Prime Minister of India"}]},
+  {"name":"Абдул Калам","lang":"ru","birth":"1931-10-15","time":"15:13","place":"Рамешварам","events":[
+    {"year":1998,"category":"study","outcome":"success","ru":"руководил ядерной программой Индии","en":"led India's nuclear programme"},
+    {"year":2002,"category":"politics","outcome":"success","ru":"избран президентом Индии","en":"elected President of India"}]},
+  {"name":"Сачин Тендулкар","lang":"ru","birth":"1973-04-24","time":"17:03","place":"Мумбаи","events":[
+    {"year":1994,"category":"career","outcome":"success","ru":"первый век в роли атакующего","en":"first century as an opener"},
+    {"year":2011,"category":"career","outcome":"success","ru":"победа на чемпионате мира","en":"World Cup victory"}]},
+  {"name":"Вират Кохли","lang":"ru","birth":"1988-11-05","time":"12:00","place":"Дели","events":[
+    {"year":2016,"category":"career","outcome":"success","ru":"рекордный сезон в IPL","en":"record IPL season"},
+    {"year":2022,"category":"career","outcome":"fail","ru":"спад формы","en":"form slump"}]},
+  {"name":"Махендра Сингх Дхони","lang":"ru","birth":"1981-07-07","time":"15:30","place":"Ранчи","events":[
+    {"year":2011,"category":"career","outcome":"success","ru":"победный «шестирный» финал ЧМ","en":"World Cup winning six"},
+    {"year":2013,"category":"career","outcome":"success","ru":"выиграл трофей чемпионов","en":"won the Champions Trophy"}]},
+  {"name":"Криштиану Роналду","lang":"ru","birth":"1985-02-05","time":"07:15","place":"Фуншал","events":[
+    {"year":2008,"category":"career","outcome":"success","ru":"первый «Золотой мяч»","en":"first Ballon d'Or"},
+    {"year":2016,"category":"career","outcome":"success","ru":"победа на Евро","en":"Euro victory"}]},
+  {"name":"Лионель Месси","lang":"ru","birth":"1987-06-24","time":"08:15","place":"Росарио","events":[
+    {"year":2009,"category":"career","outcome":"success","ru":"первый «Золотой мяч»","en":"first Ballon d'Or"},
+    {"year":2022,"category":"career","outcome":"success","ru":"победа на чемпионате мира","en":"World Cup victory"}]},
+  {"name":"Чарли Чаплин","lang":"ru","birth":"1889-04-16","time":"20:00","place":"Лондон","events":[
+    {"year":1931,"category":"creative","outcome":"success","ru":"фильм «Огни большого города»","en":"City Lights film"},
+    {"year":1952,"category":"move","outcome":"mixed","ru":"вынужден был покинуть США","en":"forced to leave the USA"}]},
+  {"name":"Одри Хепбёрн","lang":"ru","birth":"1929-05-04","time":"13:30","place":"Брюссель","events":[
+    {"year":1953,"category":"creative","outcome":"success","ru":"«Римские каникулы» — звезда","en":"Roman Holiday made her a star"},
+    {"year":1988,"category":"career","outcome":"success","ru":"посол доброй воли ЮНИСЕФ","en":"UNICEF goodwill ambassador"}]},
+  {"name":"Мадонна","lang":"ru","birth":"1958-08-16","time":"07:05","place":"Бэй-Сити","events":[
+    {"year":1984,"category":"creative","outcome":"success","ru":"хит Like a Virgin","en":"the Like a Virgin hit"},
+    {"year":1996,"category":"family","outcome":"success","ru":"родила дочь Лурдес","en":"daughter Lourdes was born"}]},
+  {"name":"Арнольд Шварценеггер","lang":"ru","birth":"1947-07-30","time":"04:10","place":"Тал","events":[
+    {"year":1975,"category":"career","outcome":"success","ru":"победил «Мистер Олимпия»","en":"won Mr. Olympia"},
+    {"year":2003,"category":"politics","outcome":"success","ru":"избран губернатором Калифорнии","en":"elected Governor of California"}]},
+  {"name":"Нил Армстронг","lang":"ru","birth":"1930-08-05","time":"00:31","place":"Уапаконета","events":[
+    {"year":1969,"category":"career","outcome":"success","ru":"высадка на Луну","en":"made the Moon landing"}]},
+  {"name":"Юрий Гагарин","lang":"ru","birth":"1934-03-09","time":"10:09","place":"Клушино","events":[
+    {"year":1961,"category":"career","outcome":"success","ru":"первый полёт человека в космос","en":"first human spaceflight"}]},
+  {"name":"Валентина Терешкова","lang":"ru","birth":"1937-03-06","time":"16:30","place":"Большое Масленниково","events":[
+    {"year":1963,"category":"career","outcome":"success","ru":"первая женщина в космосе","en":"first woman in space"}]},
+  {"name":"Пол Маккартни","lang":"ru","birth":"1942-06-18","time":"13:10","place":"Ливерпуль","events":[
+    {"year":1963,"category":"creative","outcome":"success","ru":"«битломания»","en":"Beatlemania"},
+    {"year":1969,"category":"family","outcome":"success","ru":"женился на Линде","en":"married Linda"},
+    {"year":1970,"category":"career","outcome":"mixed","ru":"распад The Beatles","en":"the Beatles breakup"}]},
+  {"name":"Джон Леннон","lang":"ru","birth":"1940-10-09","time":"17:00","place":"Ливерпуль","events":[
+    {"year":1963,"category":"family","outcome":"success","ru":"родился сын Джулиан","en":"son Julian was born"},
+    {"year":1967,"category":"creative","outcome":"success","ru":"альбом Sgt. Pepper","en":"the Sgt. Pepper album"},
+    {"year":1980,"category":"health","outcome":"fail","ru":"убит в Нью-Йорке","en":"shot in New York"}]},
+  {"name":"Джордж Харрисон","lang":"ru","birth":"1943-02-25","time":"11:42","place":"Ливерпуль","events":[
+    {"year":1970,"category":"creative","outcome":"success","ru":"альбом All Things Must Pass","en":"the All Things Must Pass album"}]},
+  {"name":"Ринго Старр","lang":"ru","birth":"1940-07-07","time":"05:00","place":"Ливерпуль","events":[
+    {"year":1964,"category":"career","outcome":"success","ru":"мировая слава The Beatles","en":"Beatles worldwide fame"}]},
+  {"name":"Джонни Депп","lang":"ru","birth":"1963-06-09","time":"13:50","place":"Оуэнсборо","events":[
+    {"year":2003,"category":"creative","outcome":"success","ru":"«Пираты Карибского моря»","en":"Pirates of the Caribbean"},
+    {"year":2022,"category":"money","outcome":"mixed","ru":"громкий судебный процесс","en":"high-profile court case"}]},
+  {"name":"Том Круз","lang":"ru","birth":"1962-07-03","time":"12:35","place":"Сиракьюс","events":[
+    {"year":1996,"category":"career","outcome":"success","ru":"старт франшизы «Миссия невыполнима»","en":"start of the Mission Impossible franchise"}]},
+  {"name":"Тейлор Свифт","lang":"ru","birth":"1989-12-13","time":"08:26","place":"Рединг","events":[
+    {"year":2016,"category":"creative","outcome":"mixed","ru":"конфликт, пауза в карьере","en":"public feud, career pause"},
+    {"year":2023,"category":"money","outcome":"success","ru":"рекордный тур Eras","en":"record-breaking Eras tour"}]},
+  {"name":"Мария Кюри","lang":"ru","birth":"1867-11-07","time":"08:00","place":"Варшава","events":[
+    {"year":1903,"category":"study","outcome":"success","ru":"Нобелевская премия по физике","en":"Nobel Prize in Physics"},
+    {"year":1911,"category":"study","outcome":"success","ru":"Нобелевская премия по химии","en":"Nobel Prize in Chemistry"}]},
+  {"name":"Никола Тесла","lang":"ru","birth":"1856-07-10","time":"00:15","place":"Смилян","events":[
+    {"year":1888,"category":"business","outcome":"success","ru":"контракт с Вестингаузом","en":"Westinghouse contract"},
+    {"year":1895,"category":"creative","outcome":"fail","ru":"пожар уничтожил лабораторию","en":"fire destroyed his lab"}]},
+  {"name":"Фрида Кало","lang":"ru","birth":"1907-07-06","time":"08:00","place":"Койоакан","events":[
+    {"year":1925,"category":"health","outcome":"fail","ru":"тяжёлая авария","en":"severe accident"},
+    {"year":1938,"category":"creative","outcome":"success","ru":"первая персональная выставка","en":"first solo exhibition"}]},
+  {"name":"Винсент Ван Гог","lang":"ru","birth":"1853-03-30","time":"07:00","place":"Зюндерт","events":[
+    {"year":1888,"category":"creative","outcome":"mixed","ru":"арльский период, «Подсолнухи»","en":"Arles period, Sunflowers"},
+    {"year":1890,"category":"health","outcome":"fail","ru":"ушёл из жизни","en":"passed away"}]},
+  {"name":"Лев Толстой","lang":"ru","birth":"1828-09-09","time":"07:00","place":"Ясная Поляна","events":[
+    {"year":1869,"category":"creative","outcome":"success","ru":"роман «Война и мир»","en":"the novel War and Peace"},
+    {"year":1877,"category":"creative","outcome":"success","ru":"роман «Анна Каренина»","en":"the novel Anna Karenina"}]},
+  {"name":"Фёдор Достоевский","lang":"ru","birth":"1821-11-11","time":"23:00","place":"Москва","events":[
+    {"year":1849,"category":"politics","outcome":"fail","ru":"петрашевцы, каторга","en":"arrest and exile"},
+    {"year":1866,"category":"creative","outcome":"success","ru":"роман «Преступление и наказание»","en":"the novel Crime and Punishment"},
+    {"year":1880,"category":"creative","outcome":"success","ru":"роман «Братья Карамазовы»","en":"the novel The Brothers Karamazov"}]},
+  {"name":"Александр Пушкин","lang":"ru","birth":"1799-06-06","time":"10:38","place":"Москва","events":[
+    {"year":1831,"category":"relationship","outcome":"success","ru":"женился на Наталье Гончаровой","en":"married Natalya Goncharova"},
+    {"year":1836,"category":"family","outcome":"success","ru":"в семье четверо детей","en":"family of four children"},
+    {"year":1837,"category":"health","outcome":"fail","ru":"гибель на дуэли","en":"death in a duel"}]},
+  {"name":"Анна Ахматова","lang":"ru","birth":"1889-06-23","time":"22:00","place":"Одесса","events":[
+    {"year":1912,"category":"creative","outcome":"success","ru":"сборник «Вечер»","en":"the collection Evening"},
+    {"year":1946,"category":"politics","outcome":"fail","ru":"разгромная критика, забвение","en":"public condemnation"}]}
+]
