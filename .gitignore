@@ -10,6 +10,21 @@ news_cache.json
 server.log
 server.pid
 
+# Secrets / credentials (defensive: never commit these)
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+.jks
+*.secret
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
 # Frontend
 frontend/node_modules/
 frontend/dist/
