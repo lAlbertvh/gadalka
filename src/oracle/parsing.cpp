@@ -1024,13 +1024,41 @@ static bool has_token(const std::vector<std::string>& toks, const std::string& s
     return false;
 }
 
+// Hypothetical phrasing ("а если бы Венера была в Скорпионе", "представь…",
+// "допустим") is not an assertion about the chart — contradicting it reads as
+// arguing with the user. The fact-check must stay silent there.
+static bool is_hypothetical(const std::string& low) {
+    static const char* H[] = {
+        "если бы", "что если", "если предполож", "допустим", "представ", "предполож", "гипотети",
+        "what if", "if the", "imagine", "suppose", "hypothet"};  // NOLINT
+    for (const char* h : H) if (low.find(h) != std::string::npos) return true;
+    return false;
+}
+
+// The user explicitly anchors the claim to their own reading ("в моей карте",
+// "у меня…"). A general question ("что значит накшатра Пушья?") deserves a
+// general answer, not a "в вашей карте её нет" remark.
+static bool about_own_chart(const std::string& low) {
+    static const char* O[] = {
+        "в моей карте", "моей карте", "в моей натальной", "моя натальная", "моя карта",
+        "у меня", "мой гороскоп", "мой знак", "в моём", "в моем",
+        "in my chart", "in my natal", "my chart", "my natal", "my birth"};  // NOLINT
+    for (const char* o : O) if (low.find(o) != std::string::npos) return true;
+    return false;
+}
+
 ChartMismatch detect_chart_mismatch(const Chart& chart, const std::string& text, const std::string& lang) {
     ChartMismatch out;
     const auto& t = jyotish::get(lang);
-    const auto toks = tokenize_letters(norm(text));
+    const std::string low = norm(text);
+    const auto toks = tokenize_letters(low);
     if (toks.empty()) return out;
+    const bool hypothetical = is_hypothetical(low);
+    const bool own_chart = about_own_chart(low);
 
     // ---- nakshatras: mentioned but absent from the chart -------------------
+    // Only a question anchored to the user's own chart triggers this; asking
+    // about a nakshatra in general is answered as general knowledge.
     std::vector<std::string> in_chart;
     for (int i = 0; i < 9; ++i) {
         const auto nk = nakshatra_name(chart.planets[i].nakshatra.nakshatra);
@@ -1042,11 +1070,14 @@ ChartMismatch detect_chart_mismatch(const Chart& chart, const std::string& text,
         auto it = t.nakshatra.find(en);
         const std::string ru = (it != t.nakshatra.end()) ? it->second : en;
         if (std::find(in_chart.begin(), in_chart.end(), en) != in_chart.end()) continue;
+        if (!own_chart) continue;
         if (has_token(toks, norm(ru)) || has_token(toks, norm(en)))
             out.absent_nakshatras.push_back(it != t.nakshatra.end() ? ru : en);
     }
 
     // ---- false "planet in sign" attributions --------------------------------
+    // Hypotheticals and general-knowledge remarks are never contradicted.
+    if (!hypothetical) {
     static const char* PLANETS[9] = {"Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"};
     // Short/common stems need their case forms listed explicitly.
     static const std::vector<std::string> SIGN_ALIASES = {
@@ -1094,6 +1125,7 @@ ChartMismatch detect_chart_mismatch(const Chart& chart, const std::string& text,
                 break;
             }
         }
+    }
     }
     return out;
 }

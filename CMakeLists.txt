@@ -51,6 +51,12 @@ elseif(MSVC)
     add_compile_options(/W4 /permissive- /std:c++20)
 endif()
 
+# cpp-httplib caps form-urlencoded POST bodies at an 8 KiB compile-time macro.
+# Our /api/oracle sends the whole growing chat history as one form body, so a
+# session past ~8 KiB of text silently broke with 413 (surfaced as our generic
+# 404). Raise the bar so a long conversation keeps working.
+add_compile_definitions(CPPHTTPLIB_FORM_URL_ENCODED_PAYLOAD_MAX_LENGTH=8388608)
+
 # nlohmann/json (FetchContent)
 include(FetchContent)
 # Use newer version compatible with CMake 3.20+

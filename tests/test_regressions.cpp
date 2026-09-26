@@ -1,7 +1,11 @@
 #include <gtest/gtest.h>
 #include <jyotish/oracle.hpp>
+#include <jyotish/parsing.hpp>
+#include <jyotish/core.hpp>
+#include <jyotish/i18n.hpp>
 
 using namespace jyotish::oracle;
+using namespace jyotish;
 
 TEST(RegressionsTest, JyotishExplainersAnswerBeforeOnboarding) {
     // "расскажи про джайотишь" is an informational question — it must get a
@@ -65,4 +69,50 @@ TEST(RegressionsTest, EnglishLeakDetection) {
     EXPECT_FALSE(has_english_leak("Привет! Сегодня отличный день, правда? Кот Марк спит."));
     EXPECT_FALSE(has_english_leak("qwen2.5:7b-instruct говорит хорошо", 30));
     EXPECT_FALSE(has_english_leak(""));
+}
+
+TEST(RegressionsTest, MismatchGuardIsQuietOnHypotheticalsAndGenerals) {
+    Chart::BirthData birth;
+    birth.name = "Тест";
+    birth.birth_date = "1995-08-15";
+    birth.birth_time = "14:30";
+    birth.latitude = 55.75;
+    birth.longitude = 37.62;
+    birth.tz_offset = 3.0;
+    birth.city = "Moscow";
+    jyotish::Chart chart = jyotish::compute_chart(birth);
+    const auto& t = jyotish::get("ru");
+
+    // Hypothetical ("а если бы…") — the guard must stay silent, not argue.
+    auto mm = detect_chart_mismatch(chart, "а если бы Венера была в Скорпионе, что бы это значило?", "ru");
+    EXPECT_TRUE(mm.wrong_planet_signs.empty());
+    EXPECT_TRUE(mm.absent_nakshatras.empty());
+
+    // General-knowledge nakshatra question — no "в вашей карте её нет" lecture.
+    mm = detect_chart_mismatch(chart, "что значит накшатра Пушья?", "ru");
+    EXPECT_TRUE(mm.absent_nakshatras.empty());
+
+    // Anchored to the user's own chart with a wrong attribution — guard fires.
+    const jyotish::Sign actual = chart.planets[5].sign;             // Venus
+    const jyotish::Sign wrong = actual == jyotish::Sign::Scorpio ? jyotish::Sign::Taurus : jyotish::Sign::Scorpio;
+    const std::string wname = t.sign.at(jyotish::sign_name(wrong));
+    mm = detect_chart_mismatch(chart, "у меня Венера в " + wname, "ru");
+    ASSERT_FALSE(mm.wrong_planet_signs.empty());
+    ASSERT_FALSE(mm.true_positions.empty());
+
+    // Own-chart nakshatra genuinely absent from the chart — fires with facts.
+    jyotish::Nakshatra absent = jyotish::Nakshatra::Pushya;
+    jyotish::Nakshatra chart_has[9];
+    for (int i = 0; i < 9; ++i) chart_has[i] = chart.planets[i].nakshatra.nakshatra;
+    bool in_chart = false;
+    do {
+        in_chart = false;
+        for (auto nh : chart_has) if (nh == absent) { in_chart = true; break; }
+        absent = in_chart ? static_cast<jyotish::Nakshatra>((static_cast<int>(absent) + 1) % 27) : absent;
+    } while (in_chart);
+    const auto lit = t.nakshatra.find(jyotish::nakshatra_name(absent));
+    const std::string ndisp = (lit != t.nakshatra.end()) ? lit->second : jyotish::nakshatra_name(absent);
+    mm = detect_chart_mismatch(chart, "что значит накшатра " + ndisp + " в моей карте?", "ru");
+    ASSERT_FALSE(mm.absent_nakshatras.empty());
+    EXPECT_NE(mismatch_block(mm, chart, "ru").find("НЕТ"), std::string::npos);
 }
