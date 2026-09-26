@@ -41,7 +41,7 @@ struct Settings {
     std::string store_path = "oracle_store.db";   // SQLite database file
     std::string admin_token = "";                 // authorized for /api/admin/* (empty = disabled)
     std::string admin_user = "albadmin";          // username for /api/admin/login
-    std::string topup_phone = "<TOPUP-PHONE-FROM-ENV>";      // СБП phone shown to users when coins run out
+    std::string topup_phone = "";   // СБП phone — только через env JYOTISH_TOPUP_PHONE (на сервере)
     std::string topup_url = "";                   // optional payment link opened by "put a coin" button
     int free_questions = store::kDefaultFreeLimit;
     int coins_per_pack = store::kDefaultCoinsPerPack;

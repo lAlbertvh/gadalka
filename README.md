@@ -78,7 +78,7 @@ ctest --test-dir build            # юнит-тесты (GTest)
 | `JYOTISH_PHOTO_MODEL` | `qwen2.5vl:3b` | модель для фото-анализа |
 | `JYOTISH_ADMIN_TOKEN` | пусто (выкл.) | токен админки (`/api/admin/*`) |
 | `JYOTISH_ADMIN_USER` | `albadmin` | логин админки |
-| `JYOTISH_TOPUP_PHONE` | `<TOPUP-PHONE-FROM-ENV>` | телефон СБП для пополнения монет |
+| `JYOTISH_TOPUP_PHONE` | *(обязат. на сервере)* | телефон СБП для пополнения монет — задаётся только в env, в коде нет |
 | `JYOTISH_TOPUP_URL` | пусто | ссылка оплаты, если есть СБП-сервис |
 | `JYOTISH_FEEDBACK_DIR` | `/mnt/oracle-data/feedback` | каталог JSONL-датасета |
 | `JYOTISH_SESSION_TTL_DAYS` | `60` | неактивные сессии чистятся раз в неделю |
