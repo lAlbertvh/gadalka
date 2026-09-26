@@ -93,6 +93,51 @@ ctest --test-dir build            # юнит-тесты (GTest)
 - Админка требует `JYOTISH_ADMIN_TOKEN` (пустой = API `/api/admin/*` отключён).
 - SSH на сервер — только по ключу, UFW закрывает всё, кроме 22/80/443-udp.
 
+## Ревизия и отладка
+
+**Карта кода: где чинить типичные ошибки**
+
+| Симптом | Файл(ы) |
+|---|---|
+| Поведение по умолчанию, дефолты, настройки | `include/jyotish/config.hpp`, `src/core/config.cpp` (все `env_or(...)`) |
+| База данных, схема, запросы | `src/core/store.cpp`, `include/jyotish/store.hpp` |
+| HTTP-маршруты и хендлеры | `src/http/server.cpp` (ищи `Post("/api/...")`, `Get("/api/...")`) |
+| Логика ответов оракула, лимит длины | `src/oracle/oracle.cpp` (+ `feedback.cpp`) |
+| Разбор даты/имени/координат (онбординг) | `src/oracle/parsing.cpp`, `src/oracle/onboarding.cpp` |
+| Геокодинг | `src/core/geocode.cpp`, `data/cities.tsv` |
+| Язык и форматирование реплик | `src/core/i18n.cpp`, `include/jyotish/i18n.hpp` |
+| Вызов Ollama | `src/ollama/client.cpp` |
+
+**Рабочий цикл (локально, не трогая прод)**
+
+```bash
+cmake --build build -j$(nproc)        # пересборка
+./build/jyotish_tests                 # быстрый прогон юнит-тестов
+ctest --test-dir build                # то же через CTest
+
+# отладочный сервер на своём порту и с временной БД — прод не задеваем:
+env JYOTISH_PORT=8001 JYOTISH_STORE_PATH=/tmp/dbg.db JYOTISH_FEEDBACK_DIR=/tmp/dbg-fb \
+    JYOTISH_ADMIN_TOKEN=tok JYOTISH_OLLAMA_BASE_URL=http://localhost:11434 \
+    ./build/jyotish_server
+curl http://127.0.0.1:8001/api/session   # проверить ответ
+```
+
+**Логи на сервере**
+
+- `journalctl -u oracle --no-pager -n 200` — свежий лог сервиса
+- `log_*`/`server.log` в рабочем каталоге (`/opt/oracle`), если включено
+- `systemctl restart oracle` — перезапуск после замены бинарника
+- Валидировать после деплоя: `curl -s http://127.0.0.1:8000/api/session` → HTTP 400 (это норма: ручка ждёт тело POST), `curl -s -o /dev/null -w '%{http_code}' http://<ip>/` → 200
+
+**Обновление фронта (React/Vite → dist)**
+
+```bash
+cd frontend && npm run build          # соберёт dist/ (обязательно с public/*: admin.html, шрифты, иконка)
+tar czf dist.tgz dist
+# залить архив на VDS и заменить /opt/oracle/frontend/dist
+```
+Статика читается с диска без рестарта сервиса (`set_mount_point("./frontend/dist")`), замену делай через `mv dist dist-bak` перед выкладкой.
+
 ## Деплой на VDS
 
 Операционная памятка — в [`deploy/README.md`](deploy/README.md): systemd-юниты, туннель
