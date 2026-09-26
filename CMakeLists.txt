@@ -203,6 +203,7 @@ if(BUILD_TESTS)
         tests/test_store.cpp
         tests/test_onboarding.cpp
         tests/test_feedback.cpp
+        tests/test_regressions.cpp
     )
     
     target_link_libraries(jyotish_tests PRIVATE

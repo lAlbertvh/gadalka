@@ -1,4 +1,6 @@
 #include <jyotish/oracle.hpp>
+#include <jyotish/parsing.hpp>
+#include <jyotish/i18n.hpp>
 #include <jyotish/geocode.hpp>
 #include <regex>
 #include <chrono>
@@ -951,6 +953,12 @@ std::optional<std::string> casual_answer(const std::string& text, const std::str
         if (has({"спасибо", "благодарю"})) return "Пожалуйста! Я всегда рядом — если появятся вопросы о судьбе, карьере или отношениях, расскажите о дате и времени рождения.";
         if (has({"как дела", "как ты", "как настроение", "как жизнь", "как ваши дела"})) return "У меня всё отлично, спасибо! А расскажите о себе: как вас зовут, когда и где вы родились?";
         if (has({"кто ты", "ты кто", "что ты такое", "как тебя зовут", "представься", "расскажи о себе"})) return "Я — ведический оракул: отвечаю на вопросы о судьбе, отношениях, карьере и здоровье по джйотиш. Чтобы сделать точный расчёт, назовите имя, дату и время рождения и город.";
+        if (has({"что такое джйотиш", "что такое джайотиш", "что такое джйотишь", "что такое джайотишь",
+                 "расскажи про джйотиш", "расскажи про джайотиш", "расскажи про джайотишь", "расскажи про джйотишь",
+                 "расскажи о джйотише", "расскажи о джайотише", "про джайотишь", "про джйотиш",
+                 "что такое веды", "расскажи про веды", "что такое ведическая астрология",
+                 "расскажи про астрологию", "что такое астрология"}))
+            return "Джйотиш — это ведическая астрология: древняя индийская система, которая строит натальную карту по точному положению Солнца, Луны и планет в момент вашего рождения. В отличие от газетных «гороскопов», здесь всё считается по эфемеридам — из карты читаются характер, карьера, отношения, здоровье и даша-периоды (долгие ритмы судьбы).\n\nМогу составить лично вашу карту и прогноз на день. Для точного расчёта подскажите: имя, дату и время рождения и город.";
     } else {
         if (has({"what day is today", "what day is it", "what is today", "whats today", "what's today", "what is the date"})) {
             auto ymd = std::chrono::year_month_day{day};
@@ -960,6 +968,10 @@ std::optional<std::string> casual_answer(const std::string& text, const std::str
             return "Today is " + wd + ", " + mon_en[static_cast<unsigned>(ymd.month()) - 1] + " " + std::to_string(static_cast<unsigned>(ymd.day())) + ", " + std::to_string(static_cast<int>(ymd.year())) + ".\n\nIf you'd like a personal horoscope, send your birth details.";
         }
         if (has({"thank you", "thanks"})) return "You're welcome! I'm always here — if you have questions about destiny, career or love, share your birth date and time.";
+        if (has({"what is jyotish", "what is jyotish astrology", "tell me about jyotish",
+                 "what is vedic astrology", "tell me about vedic astrology", "about jyotish",
+                 "what are the vedas", "tell me about astrology", "what is astrology"}))
+            return "Jyotish is Vedic astrology — an ancient Indian system that builds a natal chart from the exact positions of the Sun, Moon and planets at your moment of birth. Unlike newspaper \"horoscopes\", everything is computed from ephemerides: the chart reveals character, career, relationships, health and dasha periods (the long rhythm of destiny).\n\nI can build your personal chart and a reading for today. For an accurate calculation just tell me your name, birth date, time and city.";
     }
     return std::nullopt;
 }
@@ -971,6 +983,152 @@ std::string join(const std::vector<std::string>& parts, const std::string& delim
         result += delimiter + parts[i];
     }
     return result;
+}
+
+// ---------------------------------------------------------------------------
+// Chart-mismatch guard.
+//
+// Split the folded text into letter-only tokens. ASCII punctuation is a
+// separator; Cyrillic (D0/D1 leads) is copied whole so tokens stay valid UTF-8.
+static std::vector<std::string> tokenize_letters(const std::string& s) {
+    std::vector<std::string> out;
+    std::string cur;
+    for (size_t i = 0; i < s.size();) {
+        unsigned char b0 = static_cast<unsigned char>(s[i]);
+        if (b0 < 0x80 && !std::isalnum(b0)) {
+            if (!cur.empty()) { out.push_back(cur); cur.clear(); }
+            i++;
+            continue;
+        }
+        if ((b0 == 0xD0 || b0 == 0xD1) && i + 1 < s.size()) {
+            cur += s[i]; cur += s[i + 1]; i += 2; continue;
+        }
+        cur += static_cast<char>(b0);
+        i++;
+    }
+    if (!cur.empty()) out.push_back(cur);
+    return out;
+}
+
+// Exact match always; prefix match only for long, distinctive stems so that
+// common words cannot be mistaken for a sign ("мага" != "магазин").
+static bool tok_is(const std::string& tok, const std::string& stem) {
+    if (tok == stem) return true;
+    if (stem.size() >= 5 && tok.size() > stem.size() && tok.size() - stem.size() <= 4)
+        return tok.compare(0, stem.size(), stem) == 0;
+    return false;
+}
+
+static bool has_token(const std::vector<std::string>& toks, const std::string& stem) {
+    for (const auto& t : toks) if (tok_is(t, stem)) return true;
+    return false;
+}
+
+ChartMismatch detect_chart_mismatch(const Chart& chart, const std::string& text, const std::string& lang) {
+    ChartMismatch out;
+    const auto& t = jyotish::get(lang);
+    const auto toks = tokenize_letters(norm(text));
+    if (toks.empty()) return out;
+
+    // ---- nakshatras: mentioned but absent from the chart -------------------
+    std::vector<std::string> in_chart;
+    for (int i = 0; i < 9; ++i) {
+        const auto nk = nakshatra_name(chart.planets[i].nakshatra.nakshatra);
+        if (std::find(in_chart.begin(), in_chart.end(), nk) == in_chart.end())
+            in_chart.push_back(nk);
+    }
+    for (int n = 0; n < 27; ++n) {
+        const std::string en = nakshatra_name(static_cast<Nakshatra>(n));
+        auto it = t.nakshatra.find(en);
+        const std::string ru = (it != t.nakshatra.end()) ? it->second : en;
+        if (std::find(in_chart.begin(), in_chart.end(), en) != in_chart.end()) continue;
+        if (has_token(toks, norm(ru)) || has_token(toks, norm(en)))
+            out.absent_nakshatras.push_back(it != t.nakshatra.end() ? ru : en);
+    }
+
+    // ---- false "planet in sign" attributions --------------------------------
+    static const char* PLANETS[9] = {"Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"};
+    // Short/common stems need their case forms listed explicitly.
+    static const std::vector<std::string> SIGN_ALIASES = {
+        "овен","овне","овна","телец","тельце","тельца","близнец","близнеца","рак","раке","рака",
+        "лев","льве","леве","лева","дева","деве","деву","весы","весах","веса","скорпион","скорпионе",
+        "скорпионо","стрелец","стрельце","стрельца","козерог","козероге","водолей","водолее","рыбы","рыбах","рыб"
+    };
+    auto sign_named = [&](size_t idx) -> bool {
+        for (const auto& a : SIGN_ALIASES) if (tok_is(toks[idx], a)) return true;
+        for (int s = 0; s < 12; ++s) {
+            auto it = t.sign.find(sign_name(static_cast<Sign>(s)));
+            const std::string nm = (it != t.sign.end()) ? norm(it->second) : norm(sign_name(static_cast<Sign>(s)));
+            if (tok_is(toks[idx], nm)) return true;
+        }
+        return false;
+    };
+
+    for (int pi = 0; pi < 9; ++pi) {
+        auto pit = t.planet.find(PLANETS[pi]);
+        const std::string pstem = norm(pit != t.planet.end() ? pit->second : PLANETS[pi]);
+        for (size_t i = 0; i < toks.size(); ++i) {
+            if (!tok_is(toks[i], pstem)) continue;
+            for (size_t j = i + 1; j < toks.size() && j <= i + 3; ++j) {
+                if (!sign_named(j)) continue;
+                std::string claimed;
+                for (int s = 0; s < 12 && claimed.empty(); ++s) {
+                    auto sit = t.sign.find(sign_name(static_cast<Sign>(s)));
+                    const std::string disp = (sit != t.sign.end()) ? sit->second : sign_name(static_cast<Sign>(s));
+                    if (tok_is(toks[j], norm(disp))) claimed = disp;
+                }
+                for (const auto& a : SIGN_ALIASES) {
+                    if (!claimed.empty()) break;
+                    if (tok_is(toks[j], a)) claimed = a;
+                }
+                if (claimed.empty()) continue;
+
+                const auto actual = chart.planets[pi].sign;
+                auto ait = t.sign.find(sign_name(actual));
+                const std::string aname = ait != t.sign.end() ? ait->second : sign_name(actual);
+                if (norm(claimed) == norm(aname)) break;  // correct as stated
+                const std::string pname = pit != t.planet.end() ? pit->second : PLANETS[pi];
+                out.wrong_planet_signs.push_back(pname + " — " + claimed);
+                out.true_positions.push_back(pname + ": " + aname + ", " +
+                                             (lang == "ru" ? "дом " : "house ") + std::to_string(static_cast<int>(chart.planets[pi].house)));
+                break;
+            }
+        }
+    }
+    return out;
+}
+
+std::string mismatch_block(const ChartMismatch& m, const Chart& chart, const std::string& lang) {
+    if (m.absent_nakshatras.empty() && m.wrong_planet_signs.empty()) return "";
+    const auto& t = jyotish::get(lang);
+    std::string have;
+    for (int i = 0; i < 9; ++i) {
+        const auto en = nakshatra_name(chart.planets[i].nakshatra.nakshatra);
+        auto it = t.nakshatra.find(en);
+        have += (have.empty() ? "" : ", ");
+        have += (it != t.nakshatra.end() ? it->second : en);
+    }
+    std::string b;
+    if (lang == "en") {
+        b += "FACT CHECK — THE QUESTION CONTRADICTS THE CHART:\n";
+        for (const auto& n : m.absent_nakshatras)
+            b += "- Nakshatra \"" + n + "\" is NOT in this chart (chart nakshatras: " + have +
+                 "). Explain what it means in general, then say PLAINLY that it is not present in the user's chart. "
+                 "Do NOT link it to the user's planets, houses or periods, and do NOT invent its influence for them.\n";
+        for (size_t i = 0; i < m.wrong_planet_signs.size(); ++i)
+            b += "- The question states: " + m.wrong_planet_signs[i] + ". The chart says: " + m.true_positions[i] +
+                 ". State the true position; do NOT agree with the wrong attribution.\n";
+    } else {
+        b += "ПРОВЕРКА ФАКТОВ — ВОПРОС РАСХОДИТСЯ С КАРТОЙ:\n";
+        for (const auto& n : m.absent_nakshatras)
+            b += "- Накшатра «" + n + "» в этой карте НЕТ (накшатры в карте: " + have +
+                 "). Объясни, что она значит в общих чертах, и ПРЯМО скажи, что в карте пользователя её нет. "
+                 "НЕ связывай её с планетами, домами и периодами пользователя и НЕ выдумывай её влияние.\n";
+        for (size_t i = 0; i < m.wrong_planet_signs.size(); ++i)
+            b += "- В вопросе указано: " + m.wrong_planet_signs[i] + ". По карте: " + m.true_positions[i] +
+                 ". Скажи правду; НЕ соглашайся с ошибочной привязкой.\n";
+    }
+    return b;
 }
 
 } // namespace jyotish::oracle

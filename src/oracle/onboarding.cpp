@@ -390,6 +390,55 @@ bool assistant_after(const std::vector<std::string>& history, size_t after) {
 
 } // namespace
 
+bool signals_unknown_time(const std::string& question) {
+    std::string low = fold_lower(question);
+    const bool admitted_unknown = has_any_token(low, {
+        "не зна", "не помн", "не вспомн", "не увер", "не точн", "неизвест",
+        "примерно", "приблиз", "неопредел", "неточно", "навскидку"});
+    if (!admitted_unknown) return false;
+    const bool about_birth = has_any_token(low, {"время", "времени", "часов", "час",
+                                                 "time", "родил", "рожд", "birth",
+                                                 "точно", "год"});
+    // The confirmation gate has complete birth data in hand, so a bare
+    // "примерно" / "не знаю" / "не уверен" in this step refers to those very
+    // data (usually the time). Only a longer message spelling out something
+    // unrelated keeps the regular flow.
+    return about_birth || low.size() <= 60;
+}
+
+std::optional<ConfirmEcho> last_confirm_echo(const std::vector<std::string>& history_messages) {
+    for (size_t i = history_messages.size(); i-- > 0;) {
+        auto colon = history_messages[i].find(':');
+        std::string role = colon == std::string::npos ? "user" : history_messages[i].substr(0, colon);
+        if (role != "assistant") continue;
+        std::string content = colon == std::string::npos ? history_messages[i]
+                                                         : history_messages[i].substr(colon + 2);
+        auto pos = content.find("[CONFIRM|");
+        if (pos == std::string::npos) continue;
+        size_t a = pos + 9;
+        size_t b = content.find(']', a);
+        if (b == std::string::npos) continue;
+        std::string f = content.substr(a, b - a);
+        ConfirmEcho echo;
+        std::vector<std::string> parts;
+        size_t s = 0;
+        while (s <= f.size()) {
+            size_t pipe = f.find('|', s);
+            parts.push_back(f.substr(s, pipe == std::string::npos ? std::string::npos : pipe - s));
+            if (pipe == std::string::npos) break;
+            s = pipe + 1;
+        }
+        if (parts.size() >= 4) {
+            echo.birth_date = parts[0];
+            echo.birth_time = parts[1];
+            echo.city = parts[2];
+            echo.name = parts[3];
+        }
+        return echo;
+    }
+    return std::nullopt;
+}
+
 ConfirmResult confirm_birth(const std::string& question,
                             const std::vector<std::string>& history_messages,
                             const BirthInfo& info,
@@ -401,6 +450,16 @@ ConfirmResult confirm_birth(const std::string& question,
         return {ConfirmState::Confirmed, "", false};
     }
     if (im >= 0) {
+        // The user says the exact birth time is unknown ("да только время
+        // рождения я не знаю") — that is NOT consent to the chart as silently
+        // echoed. A leading "да" must not swallow the caveat.
+        if (signals_unknown_time(question)) {
+            std::string reply = confirmation_reply(info, lang, marker);
+            reply += lang == "ru"
+                ? "\n\nПринято: точное время рождения вы не знаете. Для расчёта я взял время по умолчанию — полдень (12:00). Это приближение: лагна и дома могут быть неточными, но Луна, накшатра и даша-периоды от него не зависят. Если подходит — ответьте просто «да»."
+                : "\n\nUnderstood: you don't know the exact birth time. For the calculation I use the default of noon (12:00). This is an approximation: the lagna and the houses may be slightly off, while the Moon, nakshatra and dasha periods do not depend on it. If that works — just reply \"yes\".";
+            return {ConfirmState::NeedConfirm, reply, false};
+        }
         // We already asked to confirm this exact data; affirm now or keep waiting.
         if (is_affirmative(fold_lower(question))) return {ConfirmState::Confirmed, "", true};
         return {ConfirmState::NeedConfirm, confirmation_reply(info, lang, marker), false};

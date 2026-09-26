@@ -30,6 +30,16 @@ std::optional<jyotish::geocode::CityInfo> extract_city(const std::string& text, 
 std::vector<std::string> detect_situations(const std::string& text, const std::string& lang);
 std::string format_situations(const std::vector<std::string>& situations, const std::string& lang);
 
+// Chart entities the question misattributes. Without this guard the model
+// invents a link instead of admitting that the entity is absent from the chart.
+struct ChartMismatch {
+    std::vector<std::string> absent_nakshatras;  // localized, mentioned but not in the chart
+    std::vector<std::string> wrong_planet_signs;  // localized "Венера в Скорпионе"
+    std::vector<std::string> true_positions;      // localized "Венера: Телец, дом 10"
+};
+ChartMismatch detect_chart_mismatch(const Chart& chart, const std::string& text, const std::string& lang);
+std::string mismatch_block(const ChartMismatch& m, const Chart& chart, const std::string& lang);
+
 // Casual conversation (no birth data needed)
 bool is_casual_question(const std::string& text, const std::string& lang, const BirthInfo* info);
 std::optional<std::string> casual_answer(const std::string& text, const std::string& lang, std::chrono::sys_days day);

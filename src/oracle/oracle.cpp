@@ -45,6 +45,34 @@ static bool has_cyrillic(const std::string& text) {
     return false;
 }
 
+// A Russian answer sometimes carries an untranslated English clause in the
+// middle of an otherwise correct reply ("…проявиться черезIncreased
+// self-discipline and a greater focus on personal responsibility"). The whole
+// text still contains Cyrillic, so the "no Cyrillic" retry never fires. Any
+// contiguous span of Latin letters (words joined by spaces/hyphens/commas/
+// periods/em-dashes) longer than `latin_min` inside a Russian answer is a
+// language leak → the retry pass regenerates it. Cyrillic resets the span;
+// CJK is already rejected by has_cjk().
+bool has_english_leak(const std::string& text, size_t latin_min) {
+    if (latin_min == 0) return false;
+    size_t latin = 0;
+    bool run = false;
+    for (size_t i = 0; i < text.size(); ++i) {
+        unsigned char c = static_cast<unsigned char>(text[i]);
+        if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) { ++latin; run = true; continue; }
+        if (!run) continue;
+        if (c == ' ' || c == '-' || c == ',' || c == '.' || c == '\'') continue;  // connector
+        if (c >= 0xD0 && c <= 0xD4) { latin = 0; run = false; continue; }         // Cyrillic breaks the run
+        if (c >= 0x80) {                                                          // em-dash, curly quotes, "…"
+            while (i + 1 < text.size() && (static_cast<unsigned char>(text[i + 1]) & 0xC0) == 0x80) ++i;
+            continue;
+        }
+        latin = 0;
+        run = false;
+    }
+    return latin >= latin_min;
+}
+
 static std::string trim_copy(const std::string& s) {
     size_t a = 0, b = s.size();
     while (a < b && std::isspace(static_cast<unsigned char>(s[a]))) ++a;
@@ -500,6 +528,7 @@ std::string casual_chat(const std::string& question, const std::string& lang) {
     
     const bool wrong_lang = has_cjk(reply) ||
         (lang == "ru" && !has_cyrillic(reply) && reply.length() > 8) ||
+        (lang == "ru" && has_english_leak(reply)) ||
         (lang != "ru" && has_cyrillic(reply));
     if (wrong_lang) {
         sys_msg = nlohmann::json{{"role", "system"}, {"content", system + (lang == "ru" ? ORACLE_RU_RETRY : ORACLE_EN_RETRY)}};
@@ -664,8 +693,8 @@ std::tuple<std::string, OracleContext, nlohmann::json> oracle_chat(
             : "\nYour exactly computed LAGNA is " + lagna_display
               + " " + std::to_string(static_cast<int>(charter.ascendant.degree)) + "°. Always state it as this exact sign, never name any other sign as the lagna.";
         system += lang == "ru" ? 
-            "\n\nЭТО ПЕРВЫЙ ОТВЕТ: дай КОРОТКОЕ знакомство — 2–3 абзаца: Лагна, Луна, 2–3 планеты, текущий период. Не разбирай дома. Заверши тепло, предложи фото или вопрос."
-            : "\n\nFIRST REPLY: brief intro — 2-3 paragraphs: Lagna, Moon, 2-3 planets, current period. No house analysis. End warmly, suggest photo or question.";
+            "\n\nЭТО ПЕРВЫЙ ОТВЕТ: дай КОРОТКОЕ знакомство — 2–3 абзаца: Лагна, Луна, 2–3 планеты, текущий период. Не разбирай дома. Заверши тепло, предложи фото или вопрос.\nНИКОГДА не называй себя именем собеседника и не начинай со «Меня зовут …». Не добавляй заголовок «Гороскоп на …». Сразу начинай с фактов: «Ваша лагна — …»."
+            : "\n\nFIRST REPLY: brief intro — 2-3 paragraphs: Lagna, Moon, 2-3 planets, current period. No house analysis. End warmly, suggest photo or question.\nNEVER introduce yourself using the user's name and never start with \"My name is …\". Do not add a \"Horoscope for …\" heading. Start straight with the facts: \"Your lagna is …\".";
         system += lagna_rule;
     }
     
@@ -746,6 +775,7 @@ std::string reply = predictions::ollama_chat(messages, jyotish::settings().chat_
 
     const bool wrong_language = has_cjk(reply) ||
         (lang == "ru" && !has_cyrillic(reply) && reply.length() > 8) ||
+        (lang == "ru" && has_english_leak(reply)) ||
         (lang != "ru" && has_cyrillic(reply));
     if (wrong_language) {
         auto retry_messages = messages;
@@ -785,6 +815,7 @@ std::string reply = predictions::ollama_chat(messages, jyotish::settings().chat_
 
     const bool still_wrong = has_cjk(reply) || reply.empty() ||
         (lang == "ru" && !has_cyrillic(reply) && reply.length() > 8) ||
+        (lang == "ru" && has_english_leak(reply)) ||
         (lang != "ru" && has_cyrillic(reply));
     if (still_wrong) {
         reply = lang == "ru" ? ORACLE_CANNOT_RU : ORACLE_CANNOT_EN;
@@ -892,6 +923,11 @@ std::string reply = predictions::ollama_chat(messages, jyotish::settings().chat_
     reply = substitute_name_placeholders(reply, real);
 
     fix_common_ru_errors(reply);
+
+    // Every substantive answer must end with exactly one VERBATIM pool quote.
+    // Repair the tail before clipping so the budget cannot cut the quote.
+    if (lang == "ru" || lang == "en")
+        enforce_quote_finale(reply, lang);
 
     if (settings().max_reply_chars > 0 &&
         reply.size() > static_cast<size_t>(settings().max_reply_chars))

@@ -1239,6 +1239,28 @@ void Server::oracle(const httplib::Request& req, httplib::Response& res) {
         user_texts.push_back(question);
         
         auto info = jyotish::oracle::gather_birth(user_texts);
+        // If the user admits they don't know the exact birth time ("да только
+        // время рождения я не знаю"), pin a reproducible noon default instead
+        // of preserving a word-guided guess ("днём"->14:00) and silently
+        // presenting it as fact in the confirmation echo. A numeric time stated
+        // in THIS message always wins over the default.
+        if (jyotish::oracle::signals_unknown_time(question) &&
+            !jyotish::oracle::extract_time(question).has_value()) {
+            info.birth_time = "12:00";
+        }
+        // Onboarding state is re-derived from user messages on every request,
+        // so the noon default assigned above (the user never typed it) lives
+        // only in our own "[CONFIRM|date|time|city|name]" echo. Re-read it from
+        // the last echo; without this the flow would loop "а во сколько вы
+        // родились?" the moment the user answers the follow-up ("да").
+        if (info.birth_time.empty()) {
+            if (auto echo = jyotish::oracle::last_confirm_echo(history_messages)) {
+                if (!echo->birth_date.empty() && echo->birth_date == info.birth_date &&
+                    !echo->birth_time.empty()) {
+                    info.birth_time = echo->birth_time;
+                }
+            }
+        }
         bool ready = jyotish::oracle::birth_is_ready(info);
 
         // Feedback hook: if the last assistant message carried a "[FEEDBACK..]"

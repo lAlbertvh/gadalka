@@ -70,6 +70,11 @@ bool is_casual_question(const std::string& text, const std::string& lang = "ru",
 std::optional<std::string> casual_answer(const std::string& text, const std::string& lang = "ru", std::chrono::sys_days day = {});
 std::string casual_chat(const std::string& question, const std::string& lang);
 
+// True when an otherwise-Cyrillic reply carries an untranslated Latin run
+// longer than `latin_min` letters ("…черезIncreased self-discipline…") — the
+// whole-text "no Cyrillic" retry never catches such mixtures. Exposed for tests.
+bool has_english_leak(const std::string& text, size_t latin_min = 30);
+
 // History helpers
 std::vector<std::string> split_history(const std::string& raw);
 
@@ -99,6 +104,21 @@ ConfirmResult confirm_birth(const std::string& question,
                             const std::vector<std::string>& history_messages,
                             const BirthInfo& info,
                             const std::string& lang = "ru");
+
+// True when the user explicitly says they don't know the exact birth time
+// ("да только время рождения я не знаю", "не помню точное время", "примерно…").
+// The confirmation gate must then NOT treat a leading "да" as a full consent
+// for the chart — the time is replaced by the noon default and re-confirmed.
+bool signals_unknown_time(const std::string& question);
+
+// The birth data the oracle echoed in its last "[CONFIRM|date|time|city|name]"
+// confirmation message. Onboarding state is re-derived from user messages on
+// every request, so data the user never typed (the noon default for an unknown
+// birth time) lives only in this echo and must be re-read from it.
+struct ConfirmEcho {
+    std::string birth_date, birth_time, city, name;
+};
+std::optional<ConfirmEcho> last_confirm_echo(const std::vector<std::string>& history_messages);
 
 // Context building for LLM
 struct OracleContext {

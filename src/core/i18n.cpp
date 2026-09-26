@@ -8,7 +8,7 @@ namespace {
 I18n make_ru() {
     I18n i;
     i.lagna_word = "Лагна"; i.lord_word = "Лорд"; i.planets_word = "Планеты";
-    i.moon_nakshatra_word = "Лунная накшатра"; i.balance_word = "Баланс Вимшоттари"; i.years_word = "лет";
+    i.moon_nakshatra_word = "Лунная накшатра"; i.nakshatra_word = "накшатра"; i.house_word = "дом"; i.balance_word = "Баланс Вимшоттари"; i.years_word = "лет";
     i.retro_word = " (R)"; i.combust_word = " [Comb]";
     i.aspects_word = "Аспекты"; i.yogas_word = "Йоги"; i.areas_word = "Сферы"; i.why_word = "Почему так считаю:";
     
@@ -31,7 +31,7 @@ I18n make_ru() {
 I18n make_en() {
     I18n i;
     i.lagna_word = "Lagna"; i.lord_word = "Lord"; i.planets_word = "Planets";
-    i.moon_nakshatra_word = "Moon Nakshatra"; i.balance_word = "Vimshottari balance"; i.years_word = "years";
+    i.moon_nakshatra_word = "Moon Nakshatra"; i.nakshatra_word = "nakshatra"; i.house_word = "house"; i.balance_word = "Vimshottari balance"; i.years_word = "years";
     i.retro_word = " (R)"; i.combust_word = " [Comb]";
     i.aspects_word = "Aspects"; i.yogas_word = "Yogas"; i.areas_word = "Areas"; i.why_word = "Reasoning:";
     

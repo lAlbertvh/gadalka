@@ -1,5 +1,8 @@
 #include <jyotish/oracle.hpp>
+#include <jyotish/quote_pool.hpp>
 #include <jyotish/config.hpp>
+#include <jyotish/grounding.hpp>
+#include <algorithm>
 #include <string>
 #include <vector>
 #include <random>
@@ -236,6 +239,48 @@ std::vector<std::string> sample_quotes(const std::string& lang, int n) {
         result.push_back(pool[indices[i]]);
     }
     return result;
+}
+
+namespace {
+
+
+std::string rtrim(const std::string& s) {
+    size_t e = s.find_last_not_of(" \t\r\n");
+    return e == std::string::npos ? std::string() : s.substr(0, e + 1);
+}
+
+// Body + quote, always separated by one blank line.
+std::string join_tail(const std::string& prefix, const std::string& tail) {
+    const std::string p = rtrim(prefix);
+    return p.empty() ? tail : p + "\n\n" + tail;
+}
+
+} // namespace
+
+QuoteRepair enforce_quote_finale(std::string& reply, const std::string& lang) {
+    const auto& pool = lang == "ru" ? QUOTES_RU : QUOTES_EN;
+    if (pool.empty()) return QuoteRepair::None;
+
+    // --- locate the final non-empty line ---------------------------------
+    const size_t end = reply.find_last_not_of(" \t\r\n");
+    if (end == std::string::npos) return QuoteRepair::None;
+    const size_t nl = reply.find_last_of('\n', end);
+    const size_t start = (nl == std::string::npos) ? 0 : nl + 1;
+    const std::string line = reply.substr(start, end - start + 1);
+    const std::string prefix = reply.substr(0, start);
+    const std::string nline = ground_normalize(line);
+
+    // Only ever canonicalise: the model picked a pool quote and we merely strip
+    // markdown/casing noise so the line is verbatim. Anything else is left
+    // completely untouched — inventing or swapping a quote here produced
+    // random, off-topic finales, which reads far worse than a missing one.
+    for (const auto& q : pool) {
+        if (ground_normalize(q) == nline) {
+            reply = join_tail(prefix, q);
+            return QuoteRepair::Canonicalized;
+        }
+    }
+    return QuoteRepair::None;
 }
 
 } // namespace jyotish::oracle

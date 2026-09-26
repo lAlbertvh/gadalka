@@ -144,6 +144,13 @@ OracleContext build_context(const Chart::BirthData& birth, const Chart& charter,
     if (!situations.empty()) {
         parts.push_back((lang == "ru" ? "КАКИЕ СФЕРЫ ВОЛНУЮТ:\n" : "AREAS OF CONCERN:\n") + format_situations(situations, lang));
     }
+
+    // The question may name a nakshatra or a sign that is not in this chart.
+    // Left unchecked the model happily invents a link, so state the truth.
+    if (auto mm = detect_chart_mismatch(charter, question, lang); !mm.absent_nakshatras.empty() || !mm.wrong_planet_signs.empty()) {
+        if (std::string mb = mismatch_block(mm, charter, lang); !mb.empty())
+            parts.push_back(mb);
+    }
     
     std::optional<std::string> found_date_str;
     if (found_date) {

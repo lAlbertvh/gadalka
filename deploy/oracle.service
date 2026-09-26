@@ -16,20 +16,29 @@ ExecStart=/opt/oracle/build/jyotish_server
 Restart=always
 RestartSec=3
 
+# Runtime knobs and the admin token. Written by deploy/server-setup.sh with
+# mode 0600; never commit it. The leading "-" keeps the unit startable even if
+# the file is missing, since the bind address below is hard-coded anyway.
+EnvironmentFile=-/etc/oracle.env
+
 # --- Required for the admin panel (/admin.html) ---
-# Environment=JYOTISH_ADMIN_TOKEN=change-me-strong-token
+# JYOTISH_ADMIN_TOKEN=<64 hex chars>
 
 # --- Optional knobs (defaults shown) ---
-# Environment=JYOTISH_STORE_PATH=/opt/oracle/oracle_store.db
-# Environment=JYOTISH_FREE_QUESTIONS=5
-# Environment=JYOTISH_COINS_PER_PACK=10
-# Environment=JYOTISH_COIN_PACK_PRICE_RUB=100
-# Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434
-# Environment=JYOTISH_CHAT_MODEL=qwen2.5:7b-instruct
+# JYOTISH_STORE_PATH=/opt/oracle/oracle_store.db
+# JYOTISH_FREE_QUESTIONS=5
+# JYOTISH_COINS_PER_PACK=10
+# JYOTISH_COIN_PACK_PRICE_RUB=100
+# JYOTISH_CHAT_MODEL=qwen2.5:7b-instruct
+# JYOTISH_SESSION_TTL_DAYS=30
+# JYOTISH_MAX_REPLY_CHARS=1200
 
-# Proxy NGINX/Caddy in front with TLS; bind to localhost:
+# Proxy NGINX in front with TLS. Keep this on localhost: main_server.cpp
+# defaults JYOTISH_HOST to 0.0.0.0, so an unset value would expose port 8000.
+# Port 11434 (Ollama) is reached only via the reverse SSH tunnel.
 Environment=JYOTISH_HOST=127.0.0.1
 Environment=JYOTISH_PORT=8000
+Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434
 
 [Install]
 WantedBy=multi-user.target

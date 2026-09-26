@@ -19,9 +19,16 @@ std::string chart_summary(const Chart& chart, const std::string& lang) {
         std::string pname = (pit != t.planet.end()) ? pit->second : planet_name(static_cast<Planet>(i));
         std::string retro = p.retrograde ? t.retro_word : "";
         std::string combust = p.combustion.combust ? t.combust_word : "";
-        std::string naks = (i == 1) ? (t.nakshatra.count(nakshatra_str) ? t.nakshatra.at(nakshatra_str) : nakshatra_str + " " + std::to_string(chart.moon_nakshatra.pada) + " pada") : "";
+        std::string naks;
+        if (i != 1) { // Moon gets its own dedicated line below
+            const std::string nk_en = nakshatra_name(p.nakshatra.nakshatra);
+            const std::string nk = t.nakshatra.count(nk_en) ? t.nakshatra.at(nk_en) : nk_en;
+            auto lit = t.planet.find(planet_name(p.nakshatra.lord));
+            const std::string lord = (lit != t.planet.end()) ? lit->second : planet_name(p.nakshatra.lord);
+            naks = ", " + t.nakshatra_word + " " + nk + " (" + lord + ")";
+        }
         std::string sign_str = t.sign.count(sign_name(p.sign)) ? t.sign.at(sign_name(p.sign)) : sign_name(p.sign);
-        result += "  " + pname + ": " + sign_str + " " + std::to_string(static_cast<int>(p.degree)) + "°, дом " + std::to_string(static_cast<int>(p.house)) + retro + combust + " " + naks + "\n";
+        result += "  " + pname + ": " + sign_str + " " + std::to_string(static_cast<int>(p.degree)) + "°, " + t.house_word + " " + std::to_string(static_cast<int>(p.house)) + retro + combust + naks + "\n";
     }
     
     std::string moon_nak_str = nakshatra_name(chart.moon_nakshatra.nakshatra);
